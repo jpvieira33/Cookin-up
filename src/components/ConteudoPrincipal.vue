@@ -1,25 +1,50 @@
 <template>
     <main class="conteudo-principal">
          <SuaLista :ingredientes="ingredientes" />
-         <Selecionar @adicionarIngrediente="adicionarIngrediente" @removerIngrediente="removerIngrediente"/>
+         
+         <KeepAlive include="SelecionarIngredientes">
+          <Selecionar v-if="conteudo === 'SelecionarIngredientes'"
+            @adicionarIngrediente="adicionarIngrediente" 
+            @removerIngrediente="removerIngrediente"
+            @buscarReceitas="navegar('MostrarReceitas')"
+            />
+          
+          <MostrarReceitas v-else-if="conteudo === 'MostrarReceitas'"
+          :ingredientes="ingredientes"
+          @editar-receitas="navegar('SelecionarIngredientes')" />
+         </KeepAlive>
     </main>
 </template>
 
-<script setup lang="ts">
-  import { ref } from 'vue';
+<script lang="ts">
+  import MostrarReceitas from './MostrarReceitas.vue';
   import Selecionar from './Selecionar.vue'
   import SuaLista from './SuaLista.vue';
 
-  const ingredientes = ref<string[]>([]);
-     
-   function adicionarIngrediente(e: string){
-      ingredientes.value.push(e)
-    }
+  type Pagina = 'SelecionarIngredientes' | 'MostrarReceitas';
 
-    function removerIngrediente(ingrediente: string){
-      ingredientes.value = ingredientes.value.filter(iLista => ingrediente !== iLista);
-    }
-    
+  export default{
+    data(){
+      return {
+        ingredientes: [] as string[],
+        conteudo: 'SelecionarIngredientes' as Pagina
+      }
+    },
+    components:{ Selecionar, SuaLista, MostrarReceitas },
+    methods:{
+        adicionarIngrediente(e: string){
+          this.ingredientes.push(e)
+        },
+       removerIngrediente(ingrediente: string){
+         this.ingredientes = this.ingredientes.filter(iLista => ingrediente !== iLista);
+       },
+       navegar(pagina:Pagina){
+        this.conteudo = pagina
+       }
+    },
+    emits:['adicionarIngrediente', 'removerIngrediente']
+  }
+
 </script>
 
 <style scoped >
@@ -34,7 +59,6 @@
   align-items: center;
   gap: 5rem;
 }
-
 
 @media only screen and (max-width: 1300px) {
   .conteudo-principal {

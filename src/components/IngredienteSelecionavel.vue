@@ -11,7 +11,7 @@ import Tag from './Tag.vue';
  export default {
     components: { Tag },
     props:{ 
-        ingrediente: {type: String, required: true}
+        ingrediente: {type:String, required: true}
     },
     data(){
         return{
